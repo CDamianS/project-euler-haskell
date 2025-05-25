@@ -1,0 +1,31 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '("serapeum" "alexandria") :silent t))
+
+(defpackage :square-sum
+  (:use :cl :serapeum :alexandria))
+(in-package :square-sum)
+
+(defvar *numbers* (iota 100 :start 1))
+
+(-> sum-of-squares () number)
+(defun sum-of-squares ()
+  (reduce #'+ (mapcar (lambda (x) (* x x)) *numbers*)))
+
+(-> square-of-sum () number)
+(defun square-of-sum ()
+  (let ((sum (reduce #'+ *numbers*)))
+    (* sum sum)))
+
+(-> squares-difference () number)
+(defun squares-difference ()
+  (- (square-of-sum) (sum-of-squares)))
+
+(defun main ()
+  (format t "~A~%" (squares-difference)))
+;;; vim: set ft=lisp lisp:

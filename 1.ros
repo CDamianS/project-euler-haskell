@@ -1,0 +1,31 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '("serapeum") :silent t))
+
+(defpackage :euler-one
+  (:use :cl :serapeum))
+(in-package :euler-one)
+
+(-> is-multiple (number) boolean)
+(defun is-multiple (num)
+  (or (= (mod num 5) 0) (= (mod num 3) 0)))
+
+(-> sum-multiples (number number number) number)
+(defun sum-multiples (current limit sum)
+  (if (< current limit)
+      (if (is-multiple current)
+          (sum-multiples (1+ current) limit (+ current sum))
+          (sum-multiples (1+ current) limit sum))
+      sum))
+
+(-> main () nil)
+(defun main ()
+  (format nil "~A" (sum-multiples 0 1000 0)))
+
+
+;;; vim: set ft=lisp lisp:
