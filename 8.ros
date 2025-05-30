@@ -1,0 +1,33 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '("serapeum") :silent t))
+
+(defpackage :largest-product
+  (:use :cl :serapeum))
+(in-package :largest-product)
+
+(defparameter *data* (uiop:read-file-string "8.txt"))
+(defparameter *numbers* (mapcar #'digit-char-p (coerce *data* 'list)))
+(defparameter *max-index* (- (length *numbers*) 13))
+
+(-> is-max-product (number number) number)
+(defun is-max-product (beg max)
+  (let ((current (apply #'* (subseq *numbers* beg (+ beg 13)))))
+    (if (> current max) current max)))
+
+(-> get-max-product (number number) number)
+(defun get-max-product (current max)
+  (if (= current *max-index*)
+      max
+      (get-max-product
+       (1+ current)
+       (is-max-product current max))))
+
+(defun main ()
+  (format t "~A" (get-max-product 0 0)))
+;;; vim: set ft=lisp lisp:
